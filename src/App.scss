@@ -1,0 +1,63 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Rowdies:wght@300;400;700&family=Source+Sans+Pro&display=swap");
+
+$background: #eee6ce;
+$text: #313552;
+
+* {
+  outline: none;
+}
+
+.screen {
+  font-family: "Source Sans Pro", sans-serif;
+  background-color: $background;
+  width: 100vw;
+  height: 100vh;
+  color: $text;
+  padding-top: 10vh;
+}
+
+.title {
+  font-size: 3rem;
+  text-align: center;
+  font-weight: bold;
+  font-family: "Rowdies", sans-serif;
+  letter-spacing: 0.2rem;
+}
+
+.body {
+  margin-top: 10vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  .typing_test {
+    font-size: 2rem;
+    margin-bottom: 10vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-right: 10vh;
+    padding-left: 10vh;
+  }
+
+  input {
+    width: 60vw;
+    height: 3rem;
+  }
+
+  input[type="text"] {
+    font-size: 3rem;
+    font-family: "Source Sans Pro", sans-serif;
+  }
+
+  .next_btn {
+    margin-top: 10px;
+    font-size: 3rem;
+    border: 2px solid black;
+    background-color: #fff;
+    cursor: pointer;
+    border-radius: 10%;
+  }
+}
