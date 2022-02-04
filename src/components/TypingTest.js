@@ -2,38 +2,60 @@ import React, { useState, useEffect } from "react";
 import data from "../libs/example_tests.json";
 import { COLORS } from "../libs/colors";
 import "../App.scss";
+import { QuoteGenerator } from "./QuoteGenerator";
 
 let allTypedEntries = 0;
 let uncorrectedErrors = 0;
 let currentWordIndex = 0;
+let timeSpan = 0;
 
 export default function TypingTest() {
   const [userInput, setUserInput] = useState("");
-  const [typingTest, setTypingTest] = useState("");
   const [correctedWords, setCorrectedWords] = useState([]);
+  const [typingTest, setTypingTest] = useState("");
+  const [request, setRequest] = useState(false); // use for fetching new request
+  const [isTyping, setIsTyping] = useState(false);
+  const [timeStart, setTimeStart] = useState();
+  const [netWPM, setNetWPM] = useState(0);
+
+  // get another typing test
+  const items = QuoteGenerator(request);
 
   let typingTestWithWords = getTextToArray(typingTest).withWords,
     userInputWithWords = getTextToArray(userInput).withWords,
     userInputWithLetters = getTextToArray(userInput).withLetters;
 
+  // set time start whenever user is typing
+  useEffect(() => setTimeStart(Date.now()), [isTyping]);
+
   // listens to user input
   const userInputHandler = (e) => {
     setUserInput(e.target.value.trim());
+    if (e) setIsTyping(true);
+
+    timeSpan = Math.floor((Date.now() - timeStart) / 1000);
+    setNetWPM(calNetWPM(allTypedEntries, uncorrectedErrors, timeSpan));
   };
 
   // CHANGE the typing test and RESET all
   const changeTest = () => {
-    let min = 1;
-    let max = 4;
-    let random_num = Math.floor(Math.random() * (max - min + 1) + min);
-    setTypingTest(data[random_num]);
     setUserInput("");
+    setIsTyping(false);
     currentWordIndex = 0;
+    setNetWPM(0);
+
+    // make new API call
+    setRequest(!request);
+    if (items) setTypingTest(items.content);
   };
 
   // set initial typing test
   useEffect(() => {
-    changeTest();
+    fetch("https://api.quotable.io/random")
+      .then((res) => res.json())
+      .then((json) => {
+        setTypingTest(json.content);
+      });
   }, []);
 
   // listen to key codes
@@ -63,8 +85,9 @@ export default function TypingTest() {
   if (
     typingTestWithWords[currentWordIndex] ==
     typingTestWithWords[typingTest.length - 1]
-  )
+  ) {
     changeTest();
+  }
 
   return (
     <>
@@ -133,6 +156,8 @@ export default function TypingTest() {
           <div className="next_btn" onClick={changeTest}>
             NEXT
           </div>
+
+          <h1 style={{ color: "black" }}>{netWPM}</h1>
         </div>
       </div>
     </>
@@ -146,7 +171,9 @@ const getTextToArray = (text) => {
   };
 };
 
-const net_WPM = (allTypedEntries, uncorrectedErrors, time) => {
+const calNetWPM = (allTypedEntries, uncorrectedErrors, seconds) => {
   let gross_WPM = allTypedEntries / 5;
-  return (gross_WPM - uncorrectedErrors) / time;
+  let result = (gross_WPM - uncorrectedErrors) / (seconds / 60);
+  if (result == Infinity) return 0;
+  else return result;
 };
