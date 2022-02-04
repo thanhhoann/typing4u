@@ -22,7 +22,7 @@ export default function TypingTest() {
   };
 
   // CHANGE the typing test and RESET all
-  const changeTestHandler = () => {
+  const changeTest = () => {
     let min = 1;
     let max = 4;
     let random_num = Math.floor(Math.random() * (max - min + 1) + min);
@@ -33,7 +33,7 @@ export default function TypingTest() {
 
   // set initial typing test
   useEffect(() => {
-    changeTestHandler();
+    changeTest();
   }, []);
 
   // listen to key codes
@@ -58,6 +58,13 @@ export default function TypingTest() {
       }
     }
   };
+
+  // if user finishes the test
+  if (
+    typingTestWithWords[currentWordIndex] ==
+    typingTestWithWords[typingTest.length - 1]
+  )
+    changeTest();
 
   return (
     <>
@@ -103,6 +110,7 @@ export default function TypingTest() {
                       </span>
                     );
                   })}
+
                   <span
                     style={{
                       textDecoration: `${COLORS.UNDERLINE_SPACEBAR} underline`,
@@ -122,7 +130,7 @@ export default function TypingTest() {
             value={userInput}
           />
 
-          <div className="next_btn" onClick={changeTestHandler}>
+          <div className="next_btn" onClick={changeTest}>
             NEXT
           </div>
         </div>
