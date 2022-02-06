@@ -8,11 +8,14 @@ let allTypedEntries = 0;
 let uncorrectedErrors = 0;
 let currentWordIndex = 0;
 let timeSpan = 0;
+let caretPosition = 0;
+let charWidth = 17;
 
 export default function TypingTest() {
   const [userInput, setUserInput] = useState("");
   const [correctedWords, setCorrectedWords] = useState([]);
   const [typingTest, setTypingTest] = useState("");
+  const [author, setAuthor] = useState("");
   const [request, setRequest] = useState(false); // use for fetching new request
   const [isTyping, setIsTyping] = useState(false);
   const [timeStart, setTimeStart] = useState();
@@ -25,20 +28,32 @@ export default function TypingTest() {
     userInputWithWords = getTextToArray(userInput).withWords,
     userInputWithLetters = getTextToArray(userInput).withLetters;
 
+  let timeLeft = 10000;
+  let timeMax = 10000;
+  let countDown;
+
   // set time start whenever user is typing
-  useEffect(() => setTimeStart(Date.now()), [isTyping]);
+  useEffect(() => {
+    // countDown = setInterval(() => {
+    // console.log(timeLeft / 1000);
+    // timeLeft -= 1000;
+    // }, 1000);
+  }, [isTyping]);
 
   // listens to user input
   const userInputHandler = (e) => {
     setUserInput(e.target.value.trim());
     if (e) setIsTyping(true);
-
-    timeSpan = Math.floor((Date.now() - timeStart) / 1000);
-    setNetWPM(calNetWPM(allTypedEntries, uncorrectedErrors, timeSpan));
   };
 
   // CHANGE the typing test and RESET all
   const changeTest = () => {
+    // clearInterval(countDown);
+    // console.log("STOP!");
+    // timeSpan = Math.floor((Date.now() - timeStart) / 1000);
+    // setNetWPM(calNetWPM(allTypedEntries, uncorrectedErrors, timeSpan));
+
+    // reset states
     setUserInput("");
     setIsTyping(false);
     currentWordIndex = 0;
@@ -54,6 +69,7 @@ export default function TypingTest() {
     fetch("https://api.quotable.io/random")
       .then((res) => res.json())
       .then((json) => {
+        setAuthor(json.author);
         setTypingTest(json.content);
       });
   }, []);
@@ -66,11 +82,17 @@ export default function TypingTest() {
       ENTER: 13,
     };
 
-    if (e.keyCode == keyCodes.BACKSPACE) uncorrectedErrors++;
-    else if (e.keyCode != keyCodes.BACKSPACE) allTypedEntries++;
+    if (e.keyCode == keyCodes.BACKSPACE) {
+      if (caretPosition > 0) caretPosition -= charWidth;
+      uncorrectedErrors++;
+    } else if (e.keyCode != keyCodes.BACKSPACE) {
+      caretPosition += charWidth;
+      allTypedEntries++;
+    }
 
     if (e.keyCode == keyCodes.SPACE) {
       setUserInput(""); // empty the input field
+      caretPosition = 0; // place the caret at the start of the word
 
       // if current word is correct
       if (typingTestWithWords[currentWordIndex] == userInputWithWords) {
@@ -92,7 +114,7 @@ export default function TypingTest() {
   return (
     <>
       <div className="screen">
-        <div className="title">[ typing4u ]</div>
+        <div className="title">[ {author} ]</div>
         <div className="body">
           <div className="typing_test">
             {typingTestWithWords.map((word, wordIndex) => {
@@ -109,6 +131,20 @@ export default function TypingTest() {
                     }`,
                   }}
                 >
+                  {currentWordIndex == wordIndex && (
+                    <span
+                      className="caret"
+                      style={{
+                        color: "orange",
+                        position: "relative",
+                        left: `${caretPosition + 7}px`,
+                        transition: "0.1s ease-in-out",
+                        marginLeft: "-18px",
+                      }}
+                    >
+                      |
+                    </span>
+                  )}
                   {word.split("").map((char, charIndex) => {
                     return (
                       <span
@@ -151,11 +187,8 @@ export default function TypingTest() {
             onChange={userInputHandler}
             onKeyDown={keyDownHandler}
             value={userInput}
+            autoFocus
           />
-
-          <div className="next_btn" onClick={changeTest}>
-            NEXT
-          </div>
 
           <h1 style={{ color: "black" }}>{netWPM}</h1>
         </div>

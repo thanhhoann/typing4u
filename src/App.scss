@@ -1,14 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Rowdies:wght@300;400;700&family=Source+Sans+Pro&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800;900&display=swap");
 
-$background: #eee6ce;
-$text: #313552;
+$background: black;
+$text: white;
+$font: "Inconsolata", sans-serif;
 
 * {
   outline: none;
 }
 
 .screen {
-  font-family: "Source Sans Pro", sans-serif;
+  font-family: $font;
   background-color: $background;
   width: 100vw;
   height: 100vh;
@@ -20,7 +22,7 @@ $text: #313552;
   font-size: 3rem;
   text-align: center;
   font-weight: bold;
-  font-family: "Rowdies", sans-serif;
+  font-family: $font;
   letter-spacing: 0.2rem;
 }
 
@@ -32,6 +34,7 @@ $text: #313552;
   flex-direction: column;
 
   .typing_test {
+    font-weight: 700;
     font-size: 2rem;
     margin-bottom: 10vh;
     display: flex;
@@ -49,7 +52,7 @@ $text: #313552;
 
   input[type="text"] {
     font-size: 3rem;
-    font-family: "Source Sans Pro", sans-serif;
+    font-family: $font;
   }
 
   .next_btn {
@@ -59,5 +62,9 @@ $text: #313552;
     background-color: #fff;
     cursor: pointer;
     border-radius: 10%;
+  }
+
+  .caret {
+    animation: blink 2s ease-out;
   }
 }
